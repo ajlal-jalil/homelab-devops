@@ -1,0 +1,43 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    release: monitoring
+spec:
+  groups:
+    - name: python-api.rules
+      interval: 30s
+      rules:
+        - alert: PythonApiPodRestarting
+          expr: |
+            increase(kube_pod_container_status_restarts_total{namespace="apps", pod=~"python-api.*"}[15m]) > 3
+          for: 5m
+          labels:
+            severity: warning
+            service: python-api
+          annotations:
+            summary: "python-api pod restarting frequently"
+            description: "Pod {{`{{ $labels.pod }}`}} has restarted more than 3 times in the last 15 minutes."
+
+        - alert: PythonApiHighErrorRate
+          expr: |
+            sum(rate(requests_total{endpoint=~"/error.*"}[5m])) / sum(rate(requests_total[5m])) > 0.05
+          for: 10m
+          labels:
+            severity: critical
+            service: python-api
+          annotations:
+            summary: "python-api error rate above 5%"
+            description: "More than 5% of requests are errors over the last 10 minutes."
+
+        - alert: PythonApiDown
+          expr: up{job="python-api"} == 0
+          for: 2m
+          labels:
+            severity: critical
+            service: python-api
+          annotations:
+            summary: "python-api is down"
+            description: "Prometheus cannot scrape python-api pods."
