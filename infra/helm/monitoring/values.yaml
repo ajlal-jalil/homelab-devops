@@ -1,0 +1,56 @@
+# Pin everything to k3s-worker-1 (workload=apps)
+# Heavy observability shouldn't compete with robotics workloads on worker-2
+defaultRules:
+  create: true
+
+prometheus:
+  prometheusSpec:
+    nodeSelector:
+      workload: apps
+    retention: 7d
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
+    # This is the magic — auto-discover any ServiceMonitor in any namespace
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+
+grafana:
+  nodeSelector:
+    workload: apps
+  adminPassword: are2you3
+  persistence:
+    enabled: true
+    size: 5Gi
+  service:
+    type: NodePort
+    nodePort: 30080
+
+alertmanager:
+  alertmanagerSpec:
+    nodeSelector:
+      workload: apps
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+
+# kube-state-metrics provides cluster-level metrics (deployments, pods, nodes)
+kube-state-metrics:
+  nodeSelector:
+    workload: apps
+
+# node-exporter runs as DaemonSet — one pod per node — so no nodeSelector
+prometheus-node-exporter:
+  hostNetwork: true
