@@ -25,7 +25,7 @@ COPY src/ src/
 # declare as dependencies. This is the "magic" that means we don't
 # need to maintain a separate apt list - the package.xml IS the list
 RUN apt-get update && \
-    rosdep install --from-paths src --ignore-src -r -y &&
+    rosdep install --from-paths src --ignore-src -r -y && \
     rm -rf /var/lib/apt/lists/*
 
 # Source the ROS 2 environment, then build everything in the workspace.
