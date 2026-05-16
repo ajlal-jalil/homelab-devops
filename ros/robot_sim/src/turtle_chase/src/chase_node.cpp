@@ -91,51 +91,51 @@ class ChaseNode : public rclcpp::Node {
 
     // Called every 100ms by the timer.
     void control_step() {
-	// Don't act until we know where we are.
-	if (!odom_received_) {
-	    return;
-	}
+        // Don't act until we know where we are.
+        if (!odom_received_) {
+            return;
+        }
 
-	// Compute distance to goal using Pythagorean theorem.
-	const double dx = goal_x_ - current_x_;
-	const double dy = goal_y_ - current_y_;
-	const double distance = std::sqrt(dx * dx + dy * dy);
+        // Compute distance to goal using Pythagorean theorem.
+        const double dx = goal_x_ - current_x_;
+        const double dy = goal_y_ - current_y_;
+        const double distance = std::sqrt(dx * dx + dy * dy);
 
-	// Build the velocity command. Defaults to all zeros.
-	auto cmd = geometry_msgs::msg::Twist()
-	
-	if (distance < tolerance_) {
-	    // We're at the goal. Publish zeros to stop.
-	    cmd.linear.x = 0.0;
-	    cmd.angular.z = 0.0;
-	    // Log success exactly once.
-	    if (!goal_announced_) {
-	        RCLCPP_INFO(this->get_logger(),
-			    "Goal reached at (%.2f, %.2f)",
-			    current_x_, current_y);
-		goal_announced_ = true;
-	    }
-	} else {
-	    // Drive forward at linear_speed_.
-	    cmd.linear.x = linear_speed_;
-	    // Steer toward the goal: atan2 gives the angle in radians
-	    // from the robot's frame. Multiply by a gain (0.5) to
-	    // smooth out the turn.
-	    cmd.angular.z = std::atan2(dy, dx) * 0.5;
-	}
-	cmd_vel_pub_->publish(cmd);
+        // Build the velocity command. Defaults to all zeros.
+        auto cmd = geometry_msgs::msg::Twist();
+
+        if (distance < tolerance_) {
+            // We're at the goal. Publish zeros to stop.
+            cmd.linear.x = 0.0;
+            cmd.angular.z = 0.0;
+            // Log success exactly once.
+            if (!goal_announced_) {
+                RCLCPP_INFO(this->get_logger(),
+                            "Goal reached at (%.2f, %.2f)",
+                            current_x_, current_y_);
+                goal_announced_ = true;
+            }
+        } else {
+            // Drive forward at linear_speed_.
+            cmd.linear.x = linear_speed_;
+            // Steer toward the goal: atan2 gives the angle in radians
+            // from the robot's frame. Multiply by a gain (0.5) to
+            // smooth out the turn.
+            cmd.angular.z = std::atan2(dy, dx) * 0.5;
+        }
+        cmd_vel_pub_->publish(cmd);
     }
 
     // ----- Member variables (state of the node) -----
     // The trailing underscore is a convention: easy to tell a member
     // variable from a local variable at a glance.
-    
+
     // Smart pointers to the publisher, subscriber, timer.
     rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_pub_;
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
     rclcpp::TimerBase::SharedPtr timer_;
 
-    // Configuration (set from parameters, never modified after consruction).
+    // Configuration (set from parameters, never modified after construction).
     double goal_x_;
     double goal_y_;
     double linear_speed_;
@@ -144,21 +144,21 @@ class ChaseNode : public rclcpp::Node {
     // Runtime state.
     double current_x_ = 0.0;
     double current_y_ = 0.0;
-    double odom_received_ = false;
-    double goal_announced_ = false;
+    bool odom_received_ = false;
+    bool goal_announced_ = false;
 };
 
 
 // Standard ROS 2 main function pattern.
 int main(int argc, char** argv) {
     // Initialize the rclcpp library. Must be called before creating nodes.
-	rclcpp::init(argc, argv);
+    rclcpp::init(argc, argv);
 
-	// make_shared<ChaseNode>() creates a ChaseNode and returns a shared_ptr.
-	// spin() runs the event loop until the node is shut down.
-	rclcpp::spin(std::make_shared<ChaseNode>());
+    // make_shared<ChaseNode>() creates a ChaseNode and returns a shared_ptr.
+    // spin() runs the event loop until the node is shut down.
+    rclcpp::spin(std::make_shared<ChaseNode>());
 
-	// Clean up.
-	rclcpp::shutdown();
-	return 0;
+    // Clean up.
+    rclcpp::shutdown();
+    return 0;
 }
