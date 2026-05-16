@@ -1,0 +1,34 @@
+<?xmi version="1.0"?>
+<!--
+  package.xml is the ROS package manifest.
+  It declares the metadata, dependencies, and the build tool to use.
+  Every ROS package needs exactly one of these at its root.
+-->
+<package format="3">
+  <name>turtle_chase</name>
+  <version>0.1.0</version>
+  <description>C++ controller node that drives the TurtleBot3 to a goal.</description>
+  <maintainer email="ajlal.jalil@gmail.com">Jay</maintainer>
+  <license>MIT</license>
+
+  <!-- buildtool_depend: tools needed to BUILD this package. -->
+  <!-- ament_cmake is ROS 2's CMake-based build system. -->
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- depend: libraries needed to BOTH build AND run. -->
+  <!-- rclcpp = ROS 2 C++ client library (creates Node, publishers, etc.) -->
+  <!-- geometry_msgs = standards messages: Twist, Pose, Vector3 -->
+  <!-- nav_msgs = navigation messages: Odometry, OccupancyGrid -->
+  <depend>rclcpp</depend>
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
+
+  <!-- test_depend: tools needed only for tests. -->
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <!-- export: tells colcon what build type this package uses. -->
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
