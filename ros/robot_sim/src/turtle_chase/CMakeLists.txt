@@ -1,6 +1,6 @@
-# CMakeLists.txt tells CMake how to build this C++ package
+# CMakeLists.txt tells CMake how to build this C++ package.
 
-# Minimum CMake version. 3.8 is the floor for ROS 2 Humble
+# Minimum CMake version. 3.8 is the floor for ROS 2 Humble.
 cmake_minimum_required(VERSION 3.8)
 project(turtle_chase)
 
@@ -9,23 +9,26 @@ if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 17)
 endif()
 
-# Enable strict compiler warnings on GCC and CLang.
-# -Wall: most warnings, -Wextra:more, -Wpedantic: standards_strict.
+# Enable strict compiler warnings on GCC and Clang.
+# -Wall: most warnings, -Wextra: more, -Wpedantic: standards-strict.
 # Catching warnings early prevents bugs.
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# Find dependencies declared in package.xml
+# Find dependencies declared in package.xml.
 # REQUIRED means "fail the build if not found."
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 
+# Declare an executable: name "chase_node", from src/chase_node.cpp.
+add_executable(chase_node src/chase_node.cpp)
+
 # Link the executable against the ROS dependencies it needs.
 # ament_target_dependencies handles include paths AND linker flags
-# in one call - much simpler than vanilla CMake's two-step process.
+# in one call — much simpler than vanilla CMake's two-step process.
 ament_target_dependencies(chase_node
   rclcpp
   geometry_msgs
